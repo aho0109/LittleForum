@@ -182,13 +182,14 @@ select * from Comments;
 
 
 /*刪除用*/
+/*
 drop table Comments;
 drop table Replies;
 drop table Posts;
 drop table Sboards;
 drop table Mboards;
 drop table Forummembers;
-
+*/
 
 
 
@@ -210,6 +211,9 @@ drop table Forummembers;
 
 
 /*以下尚無作用*/
+/*
+
+
 /*第二階段*/
 
 
@@ -314,3 +318,6 @@ drop table Reports;
 drop table LobyChats;
 drop table Friendships;
 drop table PrivateMessages;
+
+
+*/
