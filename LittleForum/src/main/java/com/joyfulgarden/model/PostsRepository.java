@@ -43,9 +43,10 @@ public interface PostsRepository extends JpaRepository<Posts, Integer> {
 	//查詢內文like，不知可不可行
 	public List<Posts> findByPostContentContaining(String xxxcontent);
 	
-	 
+	/* 
 	//關鍵字模糊搜尋
 	//(已解決)bug:文章刪了但 回覆沒刪或留言沒刪 找的時候還是會跑出來 點進去就消失
+	//(但又有新bug，會跑出一些不相干結果，可能是left join沒寫好)
 	@Query(value = "SELECT p.postID AS postID, p.postTitle AS postTitle, p.postContent AS postContent, " +
             "p.authorNickname AS authorNickname, p.sboardID AS sboardID, p.likesCount AS likesCount, " +
             "p.postTime AS postTime, p.isDeleted AS isDeleted " +
@@ -56,6 +57,28 @@ public interface PostsRepository extends JpaRepository<Posts, Integer> {
             "r.replyContent LIKE %:keyword%) " +
             "AND p.isDeleted = 0 " +
             "AND (r.isDeleted = 0 OR r.isDeleted IS NULL)", nativeQuery = true)
+	List<Posts> findByKeywords(@Param("keyword") String keyword);
+	*/
+	
+	//關鍵字模糊搜尋by GPT
+	//(已解決)bug:文章刪了但 回覆沒刪或留言沒刪 找的時候還是會跑出來 點進去就消失
+	//(已解決)(但又有新bug，會跑出一些不相干結果，可能是left join沒寫好)
+	@Query(value = """
+            SELECT p.postID, p.postTitle, p.postContent,
+                   p.authorNickname, p.sboardID,p.likesCount,
+                   p.postTime, p.isDeleted
+            FROM Posts p
+            WHERE (p.postTitle LIKE %:keyword%  OR
+                   p.postContent LIKE %:keyword%  OR
+                   EXISTS (
+                       SELECT 1
+                       FROM Replies r
+                       WHERE r.postID = p.postID
+                         AND r.replyContent LIKE %:keyword% 
+                         AND (r.isDeleted = 0 OR r.isDeleted IS NULL)
+                   ))
+              AND p.isDeleted = 0
+            """, nativeQuery = true)
 	List<Posts> findByKeywords(@Param("keyword") String keyword);
 	
 	
